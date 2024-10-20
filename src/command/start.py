@@ -2,7 +2,6 @@ import os
 
 def start(directory, max_audio_filesize, allowed_formats):
 
-    print('Error, command start not implemented yet')
     print(directory)
     print(max_audio_filesize)
     # 1. Find all audio files in the directory below 25MB

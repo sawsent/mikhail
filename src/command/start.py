@@ -1,27 +1,77 @@
-import os
 from config.config import *
+from utils.pathbuilder import build_path as bp
+from audio.transcriber import VoskTranscriber
+
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 
 def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS):
 
     print(f"Indexing all files in '{directory}'")
 
     # 1. Find all audio files in the directory below 25MB
-    allowed_files = get_all_allowed_files(os.listdir(directory), 
-                                          conditions=[
-                                              lambda fn: os.path.getsize(directory + '/' + fn) < max_audio_filesize, 
-                                              lambda fn: fn.split('.')[-1] in allowed_formats
-                                          ])
+    conditions = [
+        lambda fn: os.path.getsize(bp(directory, fn)) < max_audio_filesize, 
+        lambda fn: fn.split('.')[-1] in allowed_formats
+    ]
+    allowed_files = get_all_allowed_files(os.listdir(directory), conditions=conditions)
 
     if len(allowed_files) == 0:
         print("No suitable files found. No changes were made. Quitting...")
+        exit(1)
     else:
         print(f"Found {len(allowed_files)} files. Indexing...")
 
-    # create mikhail directory and its subdirectories
-
-
-    # create all transcript files
     
+    # check if mikhail dir already exists
+    # if yes -> cancel op and advise refresh instead, if no keep going
+
+    if os.path.exists(bp(directory, 'mikhail')):
+        print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
+        exit(1)
+
+    build_directories()
+
+    create_transcripts(directory, allowed_files)
+
+    
+def build_directories():
+    os.mkdir(LOCAL_DIR)
+    os.mkdir(bp(LOCAL_DIR, '.transcript'))
+    os.mkdir(bp(LOCAL_DIR, 'sentence'))
+    os.mkdir(bp(LOCAL_DIR, 'word'))
+
+
+def create_transcript(transcriber, directory, file, index, max):
+    print(f"Indexing {index + 1} / {max}: {file}")
+    path = bp(directory, file)
+    return {file: transcriber.transcribe(path).word_list}
+
+
+def create_transcripts(directory, allowed_files):
+
+    transcriber = VoskTranscriber(MODEL_PATH)
+
+    results = []
+    with ThreadPoolExecutor() as executor:
+        # Submit each transcription task
+        future_to_file = {executor.submit(create_transcript, transcriber, directory, file, idx, len(allowed_files)): file for idx, file in enumerate(allowed_files)}
+        
+        # Collect the results as they complete
+        for future in as_completed(future_to_file):
+            try:
+                result = future.result()
+                results.append(result)
+            except Exception as exc:
+                print(f"Error processing file {future_to_file[future]}: {exc}")
+    
+    transcriber.clean()
+
+    print(results)
+    
+
+
 
 
 def get_all_allowed_files(file_list, conditions):
@@ -29,4 +79,5 @@ def get_all_allowed_files(file_list, conditions):
 
     return allowed_files
             
+
     

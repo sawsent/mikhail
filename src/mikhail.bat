@@ -1,3 +1,5 @@
 @echo off
-python %~dp0mikhail.py %*
 
+call %~dp0..\.venv\Scripts\activate
+
+python %~dp0mikhail.py %*

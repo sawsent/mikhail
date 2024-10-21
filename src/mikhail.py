@@ -3,6 +3,7 @@ from command.refresh import refresh
 from command.find import find
 from command.build import build
 from command.space import space
+from command.clean import clean
 from config.config import *
 
 import os
@@ -12,7 +13,7 @@ def main():
 
     parser = argparse.ArgumentParser(prog='mikhail')
 
-    parser.add_argument('command', choices=['start', 'refresh', 'find', 'build', 'space'])
+    parser.add_argument('command', choices=['start', 'refresh', 'find', 'build', 'space', 'clean'])
 
     args = parser.parse_args() 
 
@@ -20,9 +21,9 @@ def main():
 
 
 def handle(command):
-
+    directory = os.getcwd()
     if command == 'start':
-        start(os.getcwd())
+        start(directory)
     if command == 'refresh':
         refresh()
     if command == 'find':
@@ -31,6 +32,8 @@ def handle(command):
         build()
     if command == 'space':
         space()
+    if command == 'clean':
+        clean(directory)
 
 if __name__ == '__main__':
     main()

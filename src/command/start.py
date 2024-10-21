@@ -1,18 +1,21 @@
 import os
+from config.config import *
 
-def start(directory, max_audio_filesize, allowed_formats):
+def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS):
 
-    print(directory)
-    print(max_audio_filesize)
+    print(f"Indexing all files in '{directory}'")
+
     # 1. Find all audio files in the directory below 25MB
-    
     allowed_files = get_all_allowed_files(os.listdir(directory), 
                                           conditions=[
                                               lambda fn: os.path.getsize(directory + '/' + fn) < max_audio_filesize, 
                                               lambda fn: fn.split('.')[-1] in allowed_formats
                                           ])
 
-    print(allowed_files)
+    if len(allowed_files) == 0:
+        print("No suitable files found. No changes were made. Quitting...")
+    else:
+        print(f"Found {len(allowed_files)} files. Indexing...")
 
     # create mikhail directory and its subdirectories
 

@@ -16,14 +16,13 @@ def main():
 
     args = parser.parse_args() 
 
-    print(args)
     handle(args.command)
 
 
 def handle(command):
 
     if command == 'start':
-        start(os.getcwd(), MAX_AUDIO_FILESIZE, ALLOWED_FORMATS)
+        start(os.getcwd())
     if command == 'refresh':
         refresh()
     if command == 'find':

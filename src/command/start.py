@@ -8,7 +8,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS):
 
-    print(f"Indexing all files in '{directory}'")
+    # check if mikhail dir already exists
+    # if yes -> cancel op and advise refresh instead, if no keep going
+
+    if os.path.exists(bp(directory, 'mikhail')):
+        print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
+        exit(1)
+
 
     # 1. Find all audio files in the directory below 25MB
     conditions = [
@@ -21,16 +27,9 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
         print("No suitable files found. No changes were made. Quitting...")
         exit(1)
     else:
-        print(f"Found {len(allowed_files)} files. Indexing...")
+        print(f"Found {len(allowed_files)} in '{directory}' files. Indexing...")
 
     
-    # check if mikhail dir already exists
-    # if yes -> cancel op and advise refresh instead, if no keep going
-
-    if os.path.exists(bp(directory, 'mikhail')):
-        print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
-        exit(1)
-
     build_directories()
 
     create_transcripts(directory, allowed_files)

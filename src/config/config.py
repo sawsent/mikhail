@@ -13,7 +13,7 @@ ASK_CONFIRMATION = False
 
 # model
 MODELS_DIR = bp(BASE_DIR, 'models')
-MODEL_NAME = "vosk-model-en-us-0.22-lgraph"
+MODEL_NAME = "vosk-model-small-en-us-0.15"
 MODEL_PATH = bp(MODELS_DIR, MODEL_NAME)
 
 # audio converter

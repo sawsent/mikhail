@@ -1,4 +1,4 @@
-from audio.transcript import Transcript
+from storage.transcript import Transcript
 from audio.converter import Converter
 from config.config import *
 
@@ -63,10 +63,8 @@ class VoskTranscriber:
                         'start': start_time,
                         'end': end_time
                     })
-            
-        transcript = Transcript(word_timestamps)
 
-        return transcript
+        return word_timestamps
 
     def clean(self):
 

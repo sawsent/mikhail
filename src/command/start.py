@@ -1,12 +1,15 @@
 from config.config import *
 from utils.pathbuilder import build_path as bp
 from audio.transcriber import VoskTranscriber
+from storage.transcript import Transcript
+from storage.file_manager import FileManager
 
 import os
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS):
+def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS, model=MODEL_NAME):
 
     # check if mikhail dir already exists
     # if yes -> cancel op and advise refresh instead, if no keep going
@@ -32,7 +35,9 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
     
     build_directories()
 
-    create_transcripts(directory, allowed_files)
+    transcript = create_transcript(directory, allowed_files, model)
+
+    FileManager().save(directory, transcript)
 
     
 def build_directories():
@@ -42,33 +47,33 @@ def build_directories():
     os.mkdir(bp(LOCAL_DIR, 'word'))
 
 
-def create_transcript(transcriber, directory, file, index, max):
+def transcribe_file(transcriber, directory, file, index, max):
     print(f"Indexing {index + 1} / {max}: {file}")
     path = bp(directory, file)
-    return {file: transcriber.transcribe(path).word_list}
+    return {
+        'file': file,
+        'words': transcriber.transcribe(path)
+        }
 
 
-def create_transcripts(directory, allowed_files):
+def create_transcript(directory, allowed_files, model):
 
-    transcriber = VoskTranscriber(MODEL_PATH)
+    transcriber = VoskTranscriber(bp(MODELS_DIR, model))
 
-    results = []
+    results = {}
     with ThreadPoolExecutor() as executor:
-        # Submit each transcription task
-        future_to_file = {executor.submit(create_transcript, transcriber, directory, file, idx, len(allowed_files)): file for idx, file in enumerate(allowed_files)}
+        future_to_file = {executor.submit(transcribe_file, transcriber, directory, file, idx, len(allowed_files)): file for idx, file in enumerate(allowed_files)}
         
-        # Collect the results as they complete
         for future in as_completed(future_to_file):
             try:
                 result = future.result()
-                results.append(result)
+                results[result['file']] = result['words']
             except Exception as exc:
                 print(f"Error processing file {future_to_file[future]}: {exc}")
     
     transcriber.clean()
 
-    print(results)
-    
+    return Transcript(results, model, datetime.now().strftime('%Y-%m-%d-%H:%M:%S.%f')) 
 
 
 

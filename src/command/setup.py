@@ -9,8 +9,8 @@ def setup(is_mac_os=False):
         setup_windows()
 
 def setup_mac_os():
-    os.system(f"chmod +x {BASE_DIR}/setup/mikhail-setup.sh") 
-    os.system(f"{BASE_DIR}/setup/mikhail-setup.sh")
+    os.system(f"chmod +x {BASE_DIR}/src/setup/mikhail-setup.sh") 
+    os.system(f"{BASE_DIR}/src/setup/mikhail-setup.sh")
 
 
 def setup_windows():

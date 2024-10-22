@@ -1,4 +1,7 @@
 #!/bin/bash
 
 MIKHAIL_LOCATION="$HOME/mikhail"
-python3 $MIKHAIL_LOCATION/src/mikhail.py $@
+
+source $MIKHAIL_LOCATION/.venv/bin/activate
+python $MIKHAIL_LOCATION/src/mikhail.py $@
+deactivate

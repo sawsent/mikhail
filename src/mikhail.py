@@ -1,10 +1,4 @@
-from command.setup import setup
-from command.start import start
-from command.refresh import refresh
-from command.find import find
-from command.build import build
-from command.space import space
-from command.clean import clean
+
 from config.config import *
 
 import os
@@ -26,18 +20,25 @@ def handle(args):
     command = args.command
     directory = os.getcwd()
     if command == 'setup':
+        from command.setup import setup
         setup(is_mac_os=args.macos)
     if command == 'start':
+        from command.start import start
         start(directory)
     if command == 'refresh':
+        from command.refresh import refresh
         refresh()
     if command == 'find':
+        from command.find import find
         find()
     if command == 'build':
+        from command.build import build
         build()
     if command == 'space':
+        from command.space import space
         space()
     if command == 'clean':
+        from command.clean import clean
         clean(directory)
 
 if __name__ == '__main__':

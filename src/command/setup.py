@@ -1,5 +1,4 @@
 from config.config import *
-
 import os
 
 def setup(is_mac_os=False):
@@ -14,4 +13,5 @@ def setup_mac_os():
 
 
 def setup_windows():
-    print('Not implemented for your os yet, exiting...')
+    print(BASE_DIR)
+    os.system(f"call {BASE_DIR}\\src\\setup\\mikhail-setup.bat {BASE_DIR}")

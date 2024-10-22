@@ -39,6 +39,7 @@ Temporary Items
 .apdisk
 
 # Byte-compiled / optimized / DLL files
+src/config/__pycache__/
 __pycache__/
 *.py[cod]
 *$py.class

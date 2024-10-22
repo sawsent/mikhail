@@ -1,3 +1,4 @@
+from command.setup import setup
 from command.start import start
 from command.refresh import refresh
 from command.find import find
@@ -13,15 +14,19 @@ def main():
 
     parser = argparse.ArgumentParser(prog='mikhail')
 
-    parser.add_argument('command', choices=['start', 'refresh', 'find', 'build', 'space', 'clean'])
+    parser.add_argument('command', choices=['start', 'refresh', 'find', 'build', 'space', 'clean', 'setup'])
+    parser.add_argument('-macos', action='store_true')
 
     args = parser.parse_args() 
 
-    handle(args.command)
+    handle(args)
 
 
-def handle(command):
+def handle(args):
+    command = args.command
     directory = os.getcwd()
+    if command == 'setup':
+        setup(is_mac_os=args.macos)
     if command == 'start':
         start(directory)
     if command == 'refresh':

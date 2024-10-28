@@ -2,11 +2,12 @@ from config.config import *
 from utils.pathbuilder import build_path as bp
 from audio.transcriber import VoskTranscriber
 from storage.transcript import Transcript
-from storage.file_manager import FileManager
+from storage.transcript_storage_manager import TranscriptStorageManager
 
 import os
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 
 
 def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS, model=MODEL_NAME):
@@ -30,14 +31,16 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
         print("No suitable files found. No changes were made. Quitting...")
         exit(1)
     else:
-        print(f"Found {len(allowed_files)} in '{directory}' files. Indexing...")
+        print(f"Found {len(allowed_files)} suitable files in '{directory}'. Indexing...")
 
     
     build_directories()
 
     transcript = create_transcript(directory, allowed_files, model)
 
-    FileManager().save(directory, transcript)
+    TranscriptStorageManager.save(transcript)
+
+    print(f"Successfully started Mikhail in '{directory}'")
 
     
 def build_directories():
@@ -48,7 +51,8 @@ def build_directories():
 
 
 def transcribe_file(transcriber, directory, file, index, max):
-    print(f"Indexing {index + 1} / {max}: {file}")
+    #print(f"Indexing {index + 1} / {max}: {file}")
+
     path = bp(directory, file)
     return {
         'file': file,
@@ -64,7 +68,7 @@ def create_transcript(directory, allowed_files, model):
     with ThreadPoolExecutor() as executor:
         future_to_file = {executor.submit(transcribe_file, transcriber, directory, file, idx, len(allowed_files)): file for idx, file in enumerate(allowed_files)}
         
-        for future in as_completed(future_to_file):
+        for future in tqdm(as_completed(future_to_file), desc='', unit='file', total=len(allowed_files)):
             try:
                 result = future.result()
                 results[result['file']] = result['words']
@@ -73,7 +77,7 @@ def create_transcript(directory, allowed_files, model):
     
     transcriber.clean()
 
-    return Transcript(results, model, datetime.now().strftime('%Y-%m-%d-%H:%M:%S.%f')) 
+    return Transcript(results, directory, model, datetime.now().strftime('%Y-%m-%d-%H:%M:%S.%f')) 
 
 
 

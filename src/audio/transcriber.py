@@ -67,15 +67,9 @@ class VoskTranscriber:
         return word_timestamps
 
     def clean(self):
-
         for item in os.listdir(self.cache_location):
             item_path = os.path.join(self.cache_location, item)
             if os.path.isfile(item_path):
                 os.remove(item_path)
             elif os.path.isdir(item_path):
                 shutil.rmtree(item_path) 
-    
-
-
-
-    

@@ -1,4 +1,5 @@
 import os
+import shutil
 
 def build_path(*args) -> str:
     return os.path.join(*args)
@@ -16,15 +17,17 @@ def get_flat_directory(directory: str, return_list=[]) -> list[str]:
 
     return return_list
 
-def delete_all_with_tqdm(to_delete: list[str]) -> None:
-    from tqdm import tqdm
-
-    for item in tqdm(to_delete):
+def delete_all(to_delete) -> None:
+    for item in to_delete:
         if os.path.isdir(item):
             os.rmdir(item)
         else:
             os.remove(item)
 
 def delete_directory_with_tqdm(directory: str):
+    from tqdm import tqdm
     to_delete = get_flat_directory(directory, [])
-    delete_all_with_tqdm(to_delete)
+    delete_all(tqdm(to_delete))
+
+def delete_directory_silent(directory: str):
+    shutil.rmtree(directory) 

@@ -11,7 +11,7 @@ from tqdm import tqdm
 import inquirer
 
 
-def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS, defaultModel=MODEL_NAME):
+def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS):
 
     if os.path.exists(bp(directory, 'mikhail')):
         print(f"Mikhail already started in '{directory}', use refresh to reindex. ")

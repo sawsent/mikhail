@@ -13,9 +13,7 @@ ASK_CONFIRMATION = True
 
 # model
 MODELS_DIR = bp(BASE_DIR, 'models')
-MODEL_NAME = "vosk-model-small-en-us-0.15"
-MODEL_PATH = bp(MODELS_DIR, MODEL_NAME)
 
 # audio converter
-CONVERSION_CACHE_LOCATION = f"{BASE_DIR}/temp/conversion"
+CONVERSION_CACHE_LOCATION = bp(BASE_DIR, 'temp', 'conversion')
 CLEAR_CONVERSION_CACHE = True

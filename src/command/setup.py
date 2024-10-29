@@ -1,5 +1,5 @@
 from config.config import *
-from utils.utils import delete_directory_with_tqdm, build_path as bp
+from utils.utils import build_path as bp
 
 import os
 import shutil
@@ -14,7 +14,13 @@ def setup(is_mac_os=False):
 
     create_venv(is_mac_os)
 
-    print(f"\nSuccessfully setup in '{BASE_DIR}'. Mikhail is ready for use! Thanks for using mikhail!")
+
+    no_model = len([d for d in os.listdir(bp(BASE_DIR, 'models')) if os.path.isdir(bp(BASE_DIR, 'models', d))]) == 0
+
+    if no_model:
+        print(f"\n[WARNING] No models found. Please download a model from 'https://alphacephei.com/vosk/models' and unzip it into '{bp(BASE_DIR, 'models')}'")
+
+    print(f"Successful setup in '{BASE_DIR}'. {'Make sure you download a model before transcribing!' if no_model else ''} Mikhail is ready for use! Thanks for using mikhail!")
 
 def create_venv(is_mac_os: bool):
     if is_mac_os:

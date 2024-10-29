@@ -17,19 +17,24 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
         print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
         exit(1)
 
+    model_options = [d for d in os.listdir(bp(BASE_DIR, 'models')) if os.path.isdir(bp(BASE_DIR, 'models', d))]
+    if len(model_options) == 0:
+        print(f"No models found. Please download a model from 'https://alphacephei.com/vosk/models' and add it to '{bp(BASE_DIR, 'models')}'")
+        exit(1)
+
     conditions = [
         lambda fn: os.path.getsize(bp(directory, fn)) < max_audio_filesize, 
         lambda fn: fn.split('.')[-1] in allowed_formats
     ]
     allowed_files = get_all_allowed_files(os.listdir(directory), conditions=conditions)
 
+    model = get_model()
+
     if len(allowed_files) == 0:
         print("No suitable files found. No changes were made. Quitting...")
         exit(1)
     else:
         print(f"Found {len(allowed_files)} suitable files in '{directory}'.")
-
-    model = get_model()
 
     print(f"Transcribing files with model '{model}'")
     
@@ -47,8 +52,8 @@ def build_directories():
     os.mkdir(bp(LOCAL_DIR, 'sentence'))
     os.mkdir(bp(LOCAL_DIR, 'word'))
 
-def get_model():
-    options = [d for d in os.listdir(bp(BASE_DIR, 'models')) if os.path.isdir(bp(BASE_DIR, 'models', d))]
+def get_model(options):
+
     if len(options) == 0:
         print(f"No models found. Please download a model from 'https://alphacephei.com/vosk/models' and add it to '{bp(BASE_DIR, 'models')}'")
         exit(1)

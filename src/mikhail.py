@@ -1,5 +1,5 @@
-
 from config.config import *
+from utils.utils import build_path as bp
 
 import os
 import argparse
@@ -15,6 +15,11 @@ def main():
 
     handle(args)
 
+def ensure_setup_done():
+    if not os.path.exists(bp(BASE_DIR, '.venv')):
+        print(f"mikhail is not setup! Please run 'mikhail setup' to make mikhail ready.")
+        exit(1)
+        
 
 def handle(args):
     command = args.command
@@ -22,6 +27,9 @@ def handle(args):
     if command == 'setup':
         from command.setup import setup
         setup(is_mac_os=args.macos)
+    else:
+        ensure_setup_done()
+
     if command == 'start':
         from command.start import start
         start(directory)

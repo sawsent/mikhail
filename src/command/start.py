@@ -28,7 +28,7 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
     ]
     allowed_files = get_all_allowed_files(os.listdir(directory), conditions=conditions)
 
-    model = get_model()
+    model = get_model(model_options)
 
     if len(allowed_files) == 0:
         print("No suitable files found. No changes were made. Quitting...")

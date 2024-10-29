@@ -1,5 +1,5 @@
 from storage.transcript import Transcript
-from utils.pathbuilder import build_path as bp
+from utils.utils import build_path as bp
 from config.config import LOCAL_DIR
 
 class TranscriptStorageManager:

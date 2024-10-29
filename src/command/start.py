@@ -1,5 +1,5 @@
 from config.config import *
-from utils.pathbuilder import build_path as bp
+from utils.utils import build_path as bp
 from audio.transcriber import VoskTranscriber
 from storage.transcript import Transcript
 from storage.transcript_storage_manager import TranscriptStorageManager
@@ -8,19 +8,15 @@ import os
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
+import inquirer
 
 
-def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS, model=MODEL_NAME):
-
-    # check if mikhail dir already exists
-    # if yes -> cancel op and advise refresh instead, if no keep going
+def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS, defaultModel=MODEL_NAME):
 
     if os.path.exists(bp(directory, 'mikhail')):
         print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
         exit(1)
 
-
-    # 1. Find all audio files in the directory below 25MB
     conditions = [
         lambda fn: os.path.getsize(bp(directory, fn)) < max_audio_filesize, 
         lambda fn: fn.split('.')[-1] in allowed_formats
@@ -31,13 +27,15 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
         print("No suitable files found. No changes were made. Quitting...")
         exit(1)
     else:
-        print(f"Found {len(allowed_files)} suitable files in '{directory}'. Indexing...")
+        print(f"Found {len(allowed_files)} suitable files in '{directory}'.")
 
+    model = get_model()
+
+    print(f"Transcribing files with model '{model}'")
     
-    build_directories()
-
     transcript = create_transcript(directory, allowed_files, model)
 
+    build_directories()
     TranscriptStorageManager.save(transcript)
 
     print(f"Successfully started Mikhail in '{directory}'")
@@ -49,9 +47,29 @@ def build_directories():
     os.mkdir(bp(LOCAL_DIR, 'sentence'))
     os.mkdir(bp(LOCAL_DIR, 'word'))
 
+def get_model():
+    options = [d for d in os.listdir(bp(BASE_DIR, 'models')) if os.path.isdir(bp(BASE_DIR, 'models', d))]
+    if len(options) == 0:
+        print(f"No models found. Please download a model from 'https://alphacephei.com/vosk/models' and add it to '{bp(BASE_DIR, 'models')}'")
+        exit(1)
+    
+    elif len(options) == 1:
+        model = options[0]
+
+    else: 
+        questions = [
+            inquirer.List(
+                "choice",
+                message="Choose the Model you want to use",
+                choices=options,
+            ),
+        ]
+        model = inquirer.prompt(questions)['choice']
+    
+    return model
+
 
 def transcribe_file(transcriber, directory, file, index, max):
-    #print(f"Indexing {index + 1} / {max}: {file}")
 
     path = bp(directory, file)
     return {
@@ -74,8 +92,10 @@ def create_transcript(directory, allowed_files, model):
                 results[result['file']] = result['words']
             except Exception as exc:
                 print(f"Error processing file {future_to_file[future]}: {exc}")
-    
-    transcriber.clean()
+                raise exc
+
+    if CLEAR_CONVERSION_CACHE:
+        transcriber.clean()
 
     return Transcript(results, directory, model, datetime.now().strftime('%Y-%m-%d-%H:%M:%S.%f')) 
 

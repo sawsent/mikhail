@@ -1,4 +1,5 @@
 from config.config import *
+from utils.utils import build_path as bp
 
 import ffmpeg
 import os
@@ -9,7 +10,7 @@ class Converter:
         self.loglevel = loglevel
 
     def convert(self, input_file: str):
-        output_file = f"{self.cache_location}/{''.join(input_file.split('/')[-1].split('.')[:-1])}.wav"
+        output_file = bp(self.cache_location, ''.join(input_file.split('/')[-1].split('.')[:-1]) + '.wav')
       
         try:
             (
@@ -20,6 +21,6 @@ class Converter:
             )
             
         except ffmpeg.Error as e:
-            print(f"Error occurred during conversion: {e.stderr.decode('utf-8')}")  # Decode error message(
+            print(f"Error occurred during conversion of file '{input_file}'") 
                 
         return output_file

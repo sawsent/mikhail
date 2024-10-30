@@ -1,5 +1,8 @@
 # mikhail
-README IN PROGRESS. TODO!!!!!!!!!!
+
+## Disclaimer
+This project is a work in progress, and so is this README, only indexing works for now...
+
 Mikhail builds voiceovers based on existing audios. I use it to build janky voiceovers from my favorite character's existing voicelines. <br>
 **IMPORTANT:** I have tested this tool in Windows 10 and MacOS. While it is expected to run on Windows 11 and Linux, I can't guarantee. Please let me know if you find any issues.
 

@@ -13,7 +13,7 @@ import inquirer
 
 def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS):
 
-    if os.path.exists(bp(directory, 'mikhail')):
+    if os.path.exists(bp(directory, LOCAL_DIR)):
         print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
         exit(1)
 
@@ -28,13 +28,13 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
     ]
     allowed_files = get_all_allowed_files(os.listdir(directory), conditions=conditions)
 
-    model = get_model(model_options)
-
     if len(allowed_files) == 0:
         print("No suitable files found. No changes were made. Quitting...")
         exit(1)
     else:
         print(f"Found {len(allowed_files)} suitable files in '{directory}'.")
+
+    model = get_model(model_options)
 
     print(f"Transcribing files with model '{model}'")
     

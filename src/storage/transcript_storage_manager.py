@@ -10,23 +10,70 @@ class TranscriptStorageManager:
         dir_to_save_in = bp(transcript.directory, LOCAL_DIR, '.transcript')
         
         with open(bp(dir_to_save_in, 'dir.transcript'), 'w') as file:
-            cls.write_headers(file, transcript.get_headers())
-            cls.write_words(file, transcript.words)
+            cls.__write_headers(file, transcript.get_headers())
+            cls.__write_words(file, transcript.words)
             file.write('#end')
+    
+    @classmethod
+    def load(cls, file_path: str) -> Transcript:
+        headers = {}
+        words = {}
+        with open(file_path, 'r') as file:
+            for line in file:
+                line = line.strip()
+
+                if line.startswith('#end'):
+                    return Transcript(words, headers)
+
+                if line.startswith('#'):
+                    key, header = cls.parse_header(line)
+                    headers[key] = header
+                
+                else: 
+                    word, start, end, file = line.split(cls.WORD_SEPARATOR)
+                    if not word in words:
+                        words[word] = []
+                    words[word].append(Transcript.to_word_payload(file, float(start), float(end)))
+                
+    
+    @classmethod
+    def parse_header(cls, line: str) -> tuple[str, any]:
+        split = line.split('=')
+
+        typ = split[0].split(':')[1]
+        key = split[0].split(':')[0].removeprefix('#')
+
+        raw_header = split[1]
+
+        if typ == 'str':
+            return (key, raw_header)
+        
+        elif typ == 'list':
+            return (key, raw_header.split(Transcript.LIST_DELIMITER))
+        
+        else: 
+            raise Exception('Unknown header type.')
 
     @classmethod
-    def write_headers(cls, file, headers):
+    def parse_word(cls, line):
+        # word, start, end, file
+        pass
+
+        
+
+    @classmethod
+    def __write_headers(cls, file, headers):
         for identifier, header in headers.items():
-            file.write(cls.build_line('#', identifier, '=', header, sep=''))
+            file.write(cls.__build_line('#', identifier, '=', header, sep=''))
 
     @classmethod
-    def write_words(cls, file, words):
+    def __write_words(cls, file, words):
         for word, appearences in words.items():
             for appearence in appearences:
-                file.write(cls.build_line(word, appearence['start'], appearence['end'], appearence['file'], sep=cls.WORD_SEPARATOR))
+                file.write(cls.__build_line(word, appearence['start'], appearence['end'], appearence['file'], sep=cls.WORD_SEPARATOR))
 
 
     @classmethod
-    def build_line(cls, *args, sep=WORD_SEPARATOR):
+    def __build_line(cls, *args, sep=WORD_SEPARATOR):
         return sep.join([str(arg) for arg in args]) + '\n' 
 

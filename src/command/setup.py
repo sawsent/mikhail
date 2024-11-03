@@ -44,7 +44,7 @@ deactivate
     else:
         command = (
             f'call "{VENV}\\Scripts\\activate.bat" && '
-            f'pip install -r "{BASE_DIR}\\requirements.txt" && '
+            f'pip install -r "{BASE_DIR}\\requirements.txt" 2>nul && '
             f'deactivate'
         )
 

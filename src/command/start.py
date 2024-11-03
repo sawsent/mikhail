@@ -102,7 +102,7 @@ def create_transcript(directory, allowed_files, model):
     if CLEAR_CONVERSION_CACHE:
         transcriber.clean()
 
-    return Transcript(results, directory, model, datetime.now().strftime('%Y-%m-%d-%H:%M:%S.%f')) 
+    return Transcript.from_dict(results, directory, model, datetime.now().strftime('%Y-%m-%d-%H:%M:%S.%f')) 
 
 
 

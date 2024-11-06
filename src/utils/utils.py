@@ -48,7 +48,7 @@ def animate_working(task, before='', after='', custom_animation=False):
             print('\b' * len(animation[0]), end='', flush=True)
             idx += 1
 
-        print(' ' + after)
+        print('      ' + after)
 
     
     stop_event = threading.Event()

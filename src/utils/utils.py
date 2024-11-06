@@ -1,5 +1,7 @@
 import os
 import shutil
+import threading
+import time
 
 def build_path(*args) -> str:
     return os.path.join(*args)
@@ -31,3 +33,34 @@ def delete_directory_with_tqdm(directory: str):
 
 def delete_directory_silent(directory: str):
     shutil.rmtree(directory) 
+
+def animate_working(task, before='', after='', custom_animation=False):
+    default_animation = [
+        '█....', '.█...', '..█..', '...█.', '....█', '...█.', '..█..', '.█...'
+    ]
+    animation = custom_animation or default_animation
+    def loading_task(stop_event):
+        print(before, end=' ')
+        idx = 0
+        while not stop_event.is_set():
+            print(animation[idx % len(animation)], end="", flush=True)
+            time.sleep(0.1)
+            print('\b' * len(animation[0]), end='', flush=True)
+            idx += 1
+
+        print(' ' + after)
+
+    
+    stop_event = threading.Event()
+    spinner_thread = threading.Thread(target=loading_task, args=(stop_event,))
+    spinner_thread.start()
+    
+    result = None
+
+    try:
+        result = task()
+    finally:
+        stop_event.set()
+        spinner_thread.join()
+
+    return result

@@ -11,11 +11,22 @@ from tqdm import tqdm
 import inquirer
 
 
-def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS):
+def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLOWED_FORMATS, force=False):
+
+    clean_confirmation = False
 
     if os.path.exists(bp(directory, LOCAL_DIR)):
-        print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
-        exit(1)
+        if force:
+            clean_confirmation = input(f"You are about to delete everything in '{bp(directory, LOCAL_DIR)}'. Are you sure you want to continue? (y/n) >> ").lower() == 'y' 
+
+        if clean_confirmation: 
+            from command.clean import clean
+            clean(directory)
+            print('\n')
+
+        else:
+            print(f"Mikhail already started in '{directory}', use refresh to reindex. ")
+            exit(1)
 
     model_options = [d for d in os.listdir(bp(BASE_DIR, 'models')) if os.path.isdir(bp(BASE_DIR, 'models', d))]
     if len(model_options) == 0:
@@ -69,6 +80,7 @@ def get_model(options):
                 choices=options,
             ),
         ]
+        
         model = inquirer.prompt(questions)['choice']
     
     return model
@@ -91,7 +103,7 @@ def create_transcript(directory, allowed_files, model):
     with ThreadPoolExecutor() as executor:
         future_to_file = {executor.submit(transcribe_file, transcriber, directory, file, idx, len(allowed_files)): file for idx, file in enumerate(allowed_files)}
         
-        for future in tqdm(as_completed(future_to_file), desc='', unit='file', total=len(allowed_files)):
+        for future in tqdm(as_completed(future_to_file), desc='Transcribing', unit='file', total=len(allowed_files)):
             try:
                 result = future.result()
                 results[result['file']] = result['words']

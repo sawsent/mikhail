@@ -51,13 +51,8 @@ def handle(args):
     # No start needed
     if command == 'start':
         from command.start import start
-        if is_started(directory) and args.force:
-            from command.clean import clean
-            print(f"Cleaning mikhail in '{directory}'")
-            clean(directory)
-            print("\n")
         print(f"Starting mikhail in '{directory}'")
-        start(directory)
+        start(directory, force=args.force)
         exit(0)
 
     if command == 'clean':

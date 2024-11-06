@@ -1,6 +1,7 @@
 from storage.transcript import Transcript
 from audio.converter import Converter
 from config.config import *
+from utils.utils import animate_working
 
 import os
 import shutil
@@ -17,12 +18,18 @@ class VoskTranscriber:
             raise Exception('Model not found.')
         
         self.model_path = model_path
-        self.model = Model(model_path)
+        self.model = self.start_model(model_path)
         self.cache_location = cache_location
         self.converter = Converter(cache_location)
 
         if not os.path.exists(cache_location):
             os.makedirs(cache_location)
+
+    def start_model(self, model_path):
+
+        model = animate_working(lambda: Model(model_path), before=f"Starting model from '{model_path}'...", after='done')
+
+        return model
 
     def transcribe(self, audio: str) -> Transcript:
 

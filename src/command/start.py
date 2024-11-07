@@ -22,7 +22,6 @@ def start(directory, max_audio_filesize=MAX_AUDIO_FILESIZE, allowed_formats=ALLO
         if clean_confirmation: 
             from command.clean import clean
             clean(directory)
-            print('\n')
 
         else:
             print(f"Mikhail already started in '{directory}', use refresh to reindex. ")

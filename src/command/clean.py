@@ -2,6 +2,7 @@ from config.config import LOCAL_DIR, ASK_CONFIRMATION
 from utils.utils import build_path as bp, delete_directory_with_tqdm
 
 import os
+import shutil
 
 def clean(directory):
 
@@ -11,10 +12,9 @@ def clean(directory):
 
     confirmation_prompt = f"You are about to clear all files in '{directory}/{LOCAL_DIR}, including transcripts and output files. Do you wish to continue? (y/n) \n >> "
     decision = not ASK_CONFIRMATION or input(confirmation_prompt).lower() == 'y'
-    
 
     if decision:
-        delete_directory_with_tqdm(bp(directory, LOCAL_DIR))
+        shutil.rmtree(bp(directory, LOCAL_DIR))
         print(f"Successfully cleaned up mikhail from '{directory}'.")
 
     else:

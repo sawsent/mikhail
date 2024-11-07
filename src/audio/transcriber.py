@@ -26,7 +26,7 @@ class VoskTranscriber:
             os.makedirs(cache_location)
 
     def start_model(self, model_path):
-        model = animate_working(lambda: Model(model_path), before=f"Starting model from '{model_path}'", after=u"done \u2713")
+        model = animate_working(lambda: Model(model_path), before=f"Starting model", after=u"done \u2713")
         return model
 
     def transcribe(self, audio: str) -> Transcript:

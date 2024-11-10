@@ -23,7 +23,7 @@ class TranscriptStorageManager:
                 line = line.strip()
 
                 if line.startswith('#end'):
-                    return Transcript(words, headers)
+                    break
 
                 if line.startswith('#'):
                     key, header = cls.parse_header(line)
@@ -34,6 +34,8 @@ class TranscriptStorageManager:
                     if not word in words:
                         words[word] = []
                     words[word].append(Transcript.to_word_payload(file, float(start), float(end)))
+
+        return Transcript(words, headers)
                 
     
     @classmethod

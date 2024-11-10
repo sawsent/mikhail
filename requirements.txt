@@ -2,3 +2,6 @@ ffmpeg-python
 vosk
 tqdm
 inquirer
+colorama
+pydub
+pyaudio

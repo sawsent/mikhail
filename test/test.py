@@ -1,7 +1,13 @@
 import os
 import sys
-import termios
-import tty
+
+if os.name == 'nt':
+    import msvcrt
+    from colorama import init
+    init()
+else:
+    import termios
+    import tty
 
 options = [{
     'name': 'option1',
@@ -34,6 +40,9 @@ def move_cursor_down(lines=1):
     sys.stdout.write(f'\033[{lines}B')
 
 def get_character():
+    if os.name == 'nt':  # Windows
+        return msvcrt.getch().decode('utf-8')
+
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
@@ -78,6 +87,7 @@ def main():
             output_message = actions[key]['message'](options[current_option]['data'])
 
         elif key == 'q':
+            move_cursor_down()
             break
 
         print("\n" + output_message)

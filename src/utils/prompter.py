@@ -8,26 +8,41 @@ else:
     import termios
     import tty
 
+class Colors:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m' 
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class Option:
     def __init__(self, name: str, data=None) -> None:
         self.name = name
         self.data = data
 
 class Action:
-    def __init__(self, letter: str, help: str, action) -> None:
+    def __init__(self, letter: str, help: str, action, quit_after=False) -> None:
         self.action = action
         self.letter = letter
         self.help = help
+        self.quit_after: bool = quit_after
 
 class Prompter:
-    Q_TO_QUIT = "'q': Quit"
+    @classmethod
+    def QUIT(cls, letter: str="q", help="Quit", action=lambda _: None) -> Action:
+        return Action(letter, help, action, quit_after=True)
 
-    def __init__(self, options, actions: list[Action], question='Select an option', quittable=True):
+    def __init__(self, options, actions: list[Action], question='Select an option', highlight_color=Colors.YELLOW):
         self.options: list[Option] = options
         self.actions: dict[str, Action] = { action.letter: action for action in actions }
         self.question = question
 
-        self.help_message = 'Help: ' + ' | '.join([ f"'{action.letter}': {action.help}" for action in actions]) + ' | ' + self.Q_TO_QUIT
+        self.help_message = 'Help: ' + ' | '.join([ f"[{action.letter}]: {action.help}" for action in actions])
+        self.highlight = highlight_color
 
     def clear_current_line(self):
         sys.stdout.write(u'\033[K')
@@ -57,7 +72,7 @@ class Prompter:
     def display_menu(self, options: list[Option], current_option):
         for i, option in enumerate(options):
             if i == current_option:
-                print(f"> {option.name}")
+                print(self.highlight + f"> {option.name}" + Colors.ENDC)
             else:
                 print(f"  {option.name}")
 
@@ -74,13 +89,13 @@ class Prompter:
                 current_option = (current_option + 1) % len(self.options)
             elif key == 'k' or key == u'\x1b[A':
                 current_option = (current_option - 1) % len(self.options)
-            elif key == 'q':
-                self.move_cursor_down()
-                return 1 
 
             elif key in self.actions:
                 action = self.actions[key]
-                data = self.options[current_option].data
-                action.action(data)
+                option = self.options[current_option]
+                action.action(option)
+                if action.quit_after:
+                    print()
+                    return 0
 
             self.move_cursor_up(len(self.options) + 2)

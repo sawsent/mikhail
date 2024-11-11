@@ -3,5 +3,4 @@ vosk
 tqdm
 inquirer
 colorama
-pydub
-pyaudio
+pygame

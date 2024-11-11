@@ -61,6 +61,7 @@ def build_directories():
     os.mkdir(bp(LOCAL_DIR, '.transcript'))
     os.mkdir(bp(LOCAL_DIR, 'sentence'))
     os.mkdir(bp(LOCAL_DIR, 'word'))
+    os.mkdir(bp(LOCAL_DIR, '.temp'))
 
 def get_model(options):
 

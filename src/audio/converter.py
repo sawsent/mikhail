@@ -9,8 +9,11 @@ class Converter:
         self.cache_location = cache_location
         self.loglevel = loglevel
 
-    def convert(self, input_file: str):
-        output_file = bp(self.cache_location, ''.join(input_file.split('/')[-1].split('.')[:-1]) + '.wav')
+    def convert(self, directory: str, file_name: str) -> str:
+
+        input_file = bp(directory, file_name)
+        output_file_name = ''.join(file_name.split('.')[:-1]) + '.wav'
+        output_file = bp(self.cache_location, output_file_name)
       
         try:
             (

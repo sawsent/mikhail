@@ -36,10 +36,11 @@ def delete_directory_silent(directory: str):
 
 def animate_working(task, before='', after='', custom_animation=False):
     default_animation = [
-        '█....', '.█...', '..█..', '...█.', '....█', '...█.', '..█..', '.█...'
+        '/', '|', '\\', '|'
     ]
     animation = custom_animation or default_animation
     def loading_task(stop_event):
+        hide_cursor()
         print(before, end=' ')
         idx = 0
         while not stop_event.is_set():
@@ -49,6 +50,7 @@ def animate_working(task, before='', after='', custom_animation=False):
             idx += 1
 
         print(' ' + after)
+        show_cursor()
 
     
     stop_event = threading.Event()
@@ -64,3 +66,9 @@ def animate_working(task, before='', after='', custom_animation=False):
         spinner_thread.join()
 
     return result
+
+def show_cursor():
+    print("\033[?25h", end="")
+
+def hide_cursor():
+    print("\033[?25l", end="")

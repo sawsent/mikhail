@@ -29,9 +29,9 @@ class VoskTranscriber:
         model = animate_working(lambda: Model(model_path), before=f"Starting model", after=u"done \u2713")
         return model
 
-    def transcribe(self, audio: str) -> Transcript:
+    def transcribe(self, directory: str, file: str) -> Transcript:
 
-        converted = self.converter.convert(audio)
+        converted = self.converter.convert(directory, file)
 
         with wave.open(converted, "rb") as wf:
 

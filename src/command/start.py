@@ -86,13 +86,12 @@ def get_model(options):
     return model
 
 
-def transcribe_file(transcriber, directory, file, index, max):
+def transcribe_file(transcriber: VoskTranscriber, directory, file):
 
-    path = bp(directory, file)
     return {
         'file': file,
-        'words': transcriber.transcribe(path)
-        }
+        'words': transcriber.transcribe(directory, file)
+    }
 
 
 def create_transcript(directory, allowed_files, model):
@@ -101,7 +100,7 @@ def create_transcript(directory, allowed_files, model):
 
     results = {}
     with ThreadPoolExecutor() as executor:
-        future_to_file = {executor.submit(transcribe_file, transcriber, directory, file, idx, len(allowed_files)): file for idx, file in enumerate(allowed_files)}
+        future_to_file = {executor.submit(transcribe_file, transcriber, directory, file): file for file in allowed_files}
         
         for future in tqdm(as_completed(future_to_file), desc='Transcribing', unit='file', total=len(allowed_files)):
             try:

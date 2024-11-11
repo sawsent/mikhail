@@ -1,5 +1,7 @@
 import os, sys
 
+from utils.utils import show_cursor, hide_cursor
+
 if os.name == 'nt':
     import msvcrt
     from colorama import init
@@ -20,7 +22,7 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 class Option:
-    def __init__(self, name: str, data=None) -> None:
+    def __init__(self, name: str, data: dict=dict()) -> None:
         self.name = name
         self.data = data
 
@@ -78,6 +80,7 @@ class Prompter:
 
     def prompt(self):
         current_option = 0
+        hide_cursor()
         
         while True:
             self.display_menu(self.options, current_option)
@@ -96,6 +99,9 @@ class Prompter:
                 action.action(option)
                 if action.quit_after:
                     print()
+                    show_cursor()
                     return 0
 
             self.move_cursor_up(len(self.options) + 2)
+
+

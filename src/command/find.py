@@ -19,7 +19,7 @@ def find(directory: str, word: str):
         handle_word_found(words[word], word, directory)
     
 def handle_word_found(occurences, word, directory):
-    print(f"Found these occurences of '{word}':")
+    print(f"Found {len(occurences)} occurences of '{word}':")
 
     occurences = enrich_with_spacing(occurences)
 
@@ -29,28 +29,34 @@ def handle_word_found(occurences, word, directory):
     actions = [
         Action(' ', 'Space to play', lambda option: play_or_crop_and_then_play(player, directory, option, word)),
         Action('e', 'Extract to file', lambda option: extract_to_file(directory, option.data, word)),
-        Prompter.QUIT(),
+        Prompter.QUIT(help="Done"),
     ]
     
-
     prompter = Prompter(options, actions)
     prompter.prompt()
 
-    print(occurences)
-
 def play_or_crop_and_then_play(player, directory, option: Option, word):
     temp_file = temp_file_path(directory, option.data, word)
+    occurence: dict = option.data
 
-    if not 'temp-file' in option.data:
-        create_temp_file(directory, option.data, temp_file)
+    ensure_exists(occurence, temp_file, directory)
     
     player.play(temp_file)
 
 def extract_to_file(directory, occurence, word):
-    output_path = temp_file_path(directory, occurence, word)
-    if not os.path.exists(output_path):
-        create_temp_file(directory, occurence, output_path)
-    os.rename(occurence['temp-file'], occurence['temp-file'].replace('.temp', 'word'))
+    temp_file = temp_file_path(directory, occurence, word)
+
+    ensure_exists(occurence, temp_file, directory)
+    
+    output_file = occurence['temp-file'].replace('.temp', 'word')
+    if not os.path.exists(output_file):
+        os.rename(temp_file, output_file)
+
+def ensure_exists(occurence, temp_file, directory):
+    if not os.path.exists(temp_file):
+        create_temp_file(directory, occurence, temp_file)
+    if not 'temp-file' in occurence:
+        occurence['temp-file'] = temp_file
 
 def enrich_with_spacing(occurences):
     max_size = max([ len(oc['file']) for oc in occurences ])

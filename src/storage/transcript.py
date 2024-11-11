@@ -8,7 +8,7 @@ class Transcript:
             converts this to:
             {word: [{filename: filename, start: start, end: end}]}
         """
-        self.words = words
+        self.words = { k: words[k] for k in sorted(words) }
         self.files_searched = headers['files_searched'] 
         self.directory = headers['directory']
         self.model = headers['model']

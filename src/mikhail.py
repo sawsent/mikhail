@@ -17,6 +17,7 @@ def main():
 
     subparsers.add_parser("clean", help="Clean all mikhail-related files in current directory, including output words and sentences.")
     subparsers.add_parser("refresh", help="Search for new audio files to index in current directory. Doesn't compromise existing transcripts and output files.")
+    subparsers.add_parser("list", help="List all words in current directory. Needs to be started")
 
     find_parser = subparsers.add_parser("find", help="Find a word in current directory.")
     find_parser.add_argument("word", help="Word to find.")
@@ -62,6 +63,10 @@ def handle(args):
     
     # start needed
     ensure_started(directory, command)
+
+    if command == 'list':
+        from command.list_words import list_words
+        list_words(directory)
 
     if command == 'refresh':
         from command.refresh import refresh

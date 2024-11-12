@@ -13,7 +13,7 @@ def find(directory: str, word: str):
     words = transcript.words
 
     if not word in words:
-        handle_word_not_found(word)
+        handle_word_not_found(word, words)
 
     else: 
         handle_word_found(words[word], word, directory)
@@ -82,7 +82,7 @@ def occurence_to_temp_file_name(word, occurence):
     return f"{word}-{processed_file}-{processed_start}-{processed_end}.{file_extension}"
 
 
-def handle_word_not_found(word):
+def handle_word_not_found(word, words):
     print(f"Word '{word}' not found in current directory.")
     exit(0)
 
